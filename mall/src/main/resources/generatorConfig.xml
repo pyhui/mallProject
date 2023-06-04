@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--连接数据库的驱动包的路径-->
+    <classPathEntry location="C:\Users\Administrator\.m2\repository\mysql\mysql-connector-java\5.1.6\mysql-connector-java-5.1.6.jar" />
+
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <!--不再追加xml内容-->
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"></plugin>
+        <!--注释-->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
+        <!--数据库连接地址及账号密码-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/mall?characterEncoding=utf-8"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!--生成DataObject类存放位置-->
+        <javaModelGenerator targetPackage="com.imooc.mall.pojo" targetProject="src/main/java">
+            <!--是否允许子包-->
+            <property name="enableSubPackages" value="true" />
+            <!--设置是否在getter方法中，对String类型字段调用trim()方法-->
+            <!--<property name="trimStrings" value="true" />-->
+        </javaModelGenerator>
+
+        <!--生成映射文件存放位置-->
+        <sqlMapGenerator targetPackage="mapper"  targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+        <!--生成Dao类的存放位置-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.imooc.mall.dao"  targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+        <!--生成对应表及类名-->
+<!--        <table tableName="mall_category" domainObjectName="Category" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" />-->
+<!--        <table tableName="mall_order" domainObjectName="Order" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" />-->
+<!--        <table tableName="mall_order_item" domainObjectName="OrderItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" />-->
+<!--        <table tableName="mall_user" domainObjectName="User" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" />-->
+        <table tableName="mall_product" domainObjectName="Product" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false">
+            <columnOverride column="sub_images" jdbcType="VARCHAR"/>
+            <columnOverride column="detail" jdbcType="VARCHAR"/>
+        </table>
+
+    </context>
+</generatorConfiguration>
