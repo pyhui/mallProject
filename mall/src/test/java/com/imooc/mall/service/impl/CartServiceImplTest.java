@@ -36,13 +36,6 @@ public class CartServiceImplTest extends MallApplicationTests {
         Assert.assertEquals(ResponseEnum.SUCCESS.getCode(), commonReturnType.getStatus());
     }
 
-    //test 列表
-    @Test
-    public void test() {
-        CommonReturnType commonReturnType = cartService.test(1);
-        log.info("list = {}", gson.toJson(commonReturnType));
-    }
-
     @Test
     public void list() {
         CommonReturnType commonReturnType = cartService.list(1);

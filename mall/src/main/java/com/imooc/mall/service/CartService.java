@@ -11,7 +11,6 @@ public interface CartService {
     //添加购物车
     CommonReturnType add(Integer uid, CartAddForm form);
 
-    CommonReturnType test(Integer uid);
     //购物车列表
     CommonReturnType list(Integer uid);
 

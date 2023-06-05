@@ -18,8 +18,8 @@ public interface ProductMapper {
     //对商品进行查询，查询它以及它下面的子类目商品
     List<Product> selectByCategoryIdSet(@Param("categoryIdSet") Set<Integer> categoryIdSet);
 
-    //查询购物车中的商品，在以cart_*命名的redis中的map键值对进行查找
-    //List<Product> selectByEntrySet(@Param("entrySet") Set<Map.Entry<String, String>> entrySet);
+    //查询购物车中的商品，用productIdSet中提供的productId进行查找
+    List<Product > selectByProductIdSet(@Param("productIdSet") Set<Integer> productIdSet);
 
     int updateByPrimaryKeySelective(Product record);
 

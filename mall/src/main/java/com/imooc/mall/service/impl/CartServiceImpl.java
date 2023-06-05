@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.imooc.mall.enums.ProductStatusEnum.DELETE;
 import static com.imooc.mall.enums.ProductStatusEnum.OFF_SALE;
@@ -79,22 +77,69 @@ public class CartServiceImpl implements CartService {
         return list(uid);
     }
 
+    //优化list方法，把SQL语句从for循环中提出来
     @Override
-    public CommonReturnType test(Integer uid) {
+    public CommonReturnType list(Integer uid) {
         HashOperations<String, String, String> opsForHash = redisTemplate.opsForHash();
         String redisKey = "cart_" + uid;
         Map<String, String> entries = opsForHash.entries(redisKey);
 
-        List<Integer> productIdList = new ArrayList<>();
+        Set<Integer> productIdSet = new HashSet<>();
         for (Map.Entry<String, String> entry : entries.entrySet()) {
             Integer productId = Integer.valueOf(entry.getKey());
-            productIdList.add(productId);
+            productIdSet.add(productId);
+        }
+        List<Product> productList = productMapper.selectByProductIdSet(productIdSet);
+        Map<Integer, Product> productMap = new HashMap<>();
+        for (Product product : productList) {
+            productMap.put(product.getId(), product);
         }
 
-        return null;
+        boolean selectAll = true;  //购物车商品是否全选
+        Integer totalQuantity = 0;    //购物车商品数量
+        BigDecimal totalPrice = new BigDecimal(0);  //购物车商品总价
+        CartVO cartVO = new CartVO();
+        List<CartProductVO> cartProductVOList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : entries.entrySet()) {
+            Integer productId = Integer.valueOf(entry.getKey());
+            Cart cart = gson.fromJson(entry.getValue(), Cart.class);
+            Product product = productMap.get(productId);
+            if (product != null) {
+                CartProductVO cartProductVO = new CartProductVO(
+                        product.getId(),
+                        cart.getQuantity(),
+                        product.getName(),
+                        product.getSubtitle(),
+                        product.getMainImage(),
+                        product.getPrice(),
+                        product.getStatus(),
+                        product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())),
+                        product.getStock(),
+                        cart.getProductSelected()
+                );
+                if (!cart.getProductSelected()) {
+                    selectAll = false;
+                }
+                //计算购物车总价，只计算选中的
+                if (cart.getProductSelected()) {
+                    totalPrice = totalPrice.add(cartProductVO.getProductTotalPrice());
+                }
+
+                cartProductVOList.add(cartProductVO);
+            }
+            //购物车中商品总数量无需写入if语句中
+            totalQuantity += cart.getQuantity();
+        }
+
+        cartVO.setCartProductVOList(cartProductVOList);
+        cartVO.setSelectAll(selectAll);
+        cartVO.setCartTotalQuantity(totalQuantity);
+        cartVO.setCartTotalPrice(totalPrice);
+        return CommonReturnType.success(cartVO);
+
     }
 
-
+/*
     @Override
     public CommonReturnType list(Integer uid) {
         HashOperations<String, String, String> opsForHash = redisTemplate.opsForHash();
@@ -145,6 +190,7 @@ public class CartServiceImpl implements CartService {
         cartVO.setCartTotalPrice(totalPrice);
         return CommonReturnType.success(cartVO);
     }
+*/
 
     @Override
     public CommonReturnType update(Integer uid, Integer productId, CartUpdateForm form) {
