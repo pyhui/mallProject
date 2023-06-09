@@ -267,7 +267,8 @@ public class CartServiceImpl implements CartService {
     }
 
     //用于查询出购物车中全部商品的列表
-    private List<Cart> listForCart(Integer uid) {
+    //订单接口需要使用到
+    public List<Cart> listForCart(Integer uid) {
         HashOperations<String, String, String> opsForHash = redisTemplate.opsForHash();
         String redisKey = "cart_" + uid;
         Map<String, String> entries = opsForHash.entries(redisKey);
