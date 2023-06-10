@@ -191,6 +191,24 @@ public class OrderServiceImpl implements OrderService {
         return CommonReturnType.success();
     }
 
+    @Override
+    public void paid(Long orderNo) {
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if (order == null) {
+            throw new RuntimeException(ResponseEnum.ORDER_NOT_EXIST.getDesc() + "订单号：" + orderNo);
+        }
+        //只有未付款的情况下才能改变状态
+        if (!order.getStatus().equals(OrderStatusEnum.NO_PAY.getCode())) {
+            throw new RuntimeException(ResponseEnum.ORDER_STATUS_ERROR.getDesc() + "订单号：" + orderNo);
+        }
+        order.setStatus(OrderStatusEnum.PAID.getCode());
+        order.setPaymentTime(new Date()); //最好实在payInfo里面拿
+        int row = orderMapper.updateByPrimaryKey(order);
+        if (row <= 0) {
+            throw new RuntimeException("将订单更新为'已支付'状态失败，订单号：" + orderNo);
+        }
+    }
+
     //order和orderItemList是对应的
     private OrderVO buildOrderVO(Order order, List<OrderItem> orderItemList, Shipping shipping) {
         OrderVO orderVO = new OrderVO();

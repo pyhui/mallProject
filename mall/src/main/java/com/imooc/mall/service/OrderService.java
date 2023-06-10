@@ -17,4 +17,7 @@ public interface OrderService {
 
     //取消订单
     CommonReturnType cancel(Integer uid, Long orderNo);
+
+    //修改订单状态，未付款 => 已付款
+    void paid(Long orderNo);
 }
